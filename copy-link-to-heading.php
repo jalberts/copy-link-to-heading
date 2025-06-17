@@ -84,11 +84,7 @@ function clth_should_load() {
     }
 
     // Check for specific content type
-    if (
-        ( is_single() && $show_for_posts && $current_post_type === 'post' ) ||
-        ( is_page() && $show_for_pages && $current_post_type === 'page' ) ||
-        ( is_singular() && in_array( $current_post_type, $enabled_cpts ) )
-    ) {
+    if ( ( is_singular( 'post' ) && $show_for_posts ) || ( is_singular( 'page' ) && $show_for_pages ) || ( is_singular( $enabled_cpts ) ) ) {
         return true;
     }
 
@@ -195,14 +191,15 @@ function clth_render_settings_page() {
                         <p class="description"><?php esc_html_e( 'If disabled, an alert will show instead of the tooltip.', 'copy-link-to-heading' ); ?></p>
                     </td>
                 </tr>
-                <tr valign="top" class="tooltip-text-options" style="<?php echo get_option( 'clth_enable_tooltip', true ) ? '' : 'display: none;'; ?>">
+                <?php $enable_tooltip_checked = get_option( 'clth_enable_tooltip', true ); ?>
+                <tr valign="top" class="tooltip-text-options" style="<?php echo $enable_tooltip_checked ? '' : 'display: none;'; ?>">
                     <th scope="row"><?php esc_html_e( 'Text for "Copy Link to Heading":', 'copy-link-to-heading' ); ?></th>
                     <td>
                         <input type="text" name="clth_copy_text" value="<?php echo esc_attr( get_option( 'clth_copy_text', 'Copy Link to Heading' ) ); ?>" class="regular-text" />
                         <p class="description"><?php esc_html_e( 'Text to display when hovering over the icon before the link is copied.', 'copy-link-to-heading' ); ?></p>
                     </td>
                 </tr>
-                <tr valign="top" class="tooltip-text-options" style="<?php echo get_option( 'clth_enable_tooltip', true ) ? '' : 'display: none;'; ?>">
+                <tr valign="top" class="tooltip-text-options" style="<?php echo $enable_tooltip_checked ? '' : 'display: none;'; ?>">
                     <th scope="row"><?php esc_html_e( 'Text for "Copied":', 'copy-link-to-heading' ); ?></th>
                     <td>
                         <input type="text" name="clth_copied_text" value="<?php echo esc_attr( get_option( 'clth_copied_text', 'Copied' ) ); ?>" class="regular-text" />

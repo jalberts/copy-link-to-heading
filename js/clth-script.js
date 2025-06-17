@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const copyText = clthData.copyText || 'Copy Link to Heading';
     const copiedText = clthData.copiedText || 'Copied';
     const iconPosition = clthData.iconPosition || 'after';
-    const contentSelector = '.entry-content, .post-content, .page-content';
+    const contentSelector = '.entry-content, .post-content, .page-content, [class*="content"], [role="main"]'; // Added more generic selectors
 
     // Add or remove class on the body based on mobile and desktop settings
     if (showIconOnMobile) {
