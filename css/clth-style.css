@@ -1,40 +1,56 @@
 /* Default styles for the copy icon */
 .clth-copy-icon {
-    display: none;
-    width: 16px;
-    height: 16px;
+    /* display: none; */ /* Visibility is now controlled by opacity and parent hover */
+    display: inline-flex; /* Use inline-flex for better alignment of SVG */
+    align-items: center;
+    justify-content: center;
+    /* width: 16px; */ /* SVG can control its own size or be styled via SVG specific CSS */
+    /* height: 16px; */
     margin-left: 8px;
     cursor: pointer;
-    background-size: contain;
-    background-repeat: no-repeat;
+    /* background-image, background-size, background-repeat removed as we use inline SVG */
     vertical-align: middle;
-    transition: opacity 0.2s;
+    opacity: 0; /* Hidden by default, shown on hover/focus or if always show is enabled */
+    transition: opacity 0.2s ease-in-out;
+}
+
+.clth-copy-icon svg.clth-svg-icon {
+    width: 1em; /* Scales with parent font size, typically around 16px for normal text */
+    height: 1em;
+    /* vertical-align: -0.125em; */ /* Optional: adjust if needed for better baseline alignment */
 }
 
 /* Show icon on hover for desktop (only if not forced to show) */
+h1:hover .clth-copy-icon,
 h2:hover .clth-copy-icon,
 h3:hover .clth-copy-icon,
 h4:hover .clth-copy-icon,
 h5:hover .clth-copy-icon,
 h6:hover .clth-copy-icon {
-    display: inline-block;
+    opacity: 1; /* Show on hover */
 }
 
 /* Ensure the icon aligns properly when shown */
 .clth-copy-icon:hover {
-    opacity: 1;
+    opacity: 1; /* Ensure it stays visible when icon itself is hovered */
 }
 
 /* Mobile-specific styles when "Always Show Icon on Mobile" is enabled */
 @media (max-width: 768px) {
     body.clth-show-icon-mobile .clth-copy-icon {
-        display: inline-block !important;
+        opacity: 1 !important; /* Always show on mobile if class is present */
     }
 }
 
 /* Desktop always show icon */
 body.clth-show-icon-desktop .clth-copy-icon {
-    display: inline-block !important;
+    opacity: 1 !important; /* Always show on desktop if class is present */
+}
+
+/* Adjust margin if icon is positioned before the heading */
+.clth-icon-position-before {
+    margin-left: 0;
+    margin-right: 8px;
 }
 
 /* Tooltip container */

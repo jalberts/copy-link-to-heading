@@ -3,8 +3,7 @@ Contributors: josevarghese
 Tags: headings, copy link, content navigation, deep linking, anchor links
 Requires at least: 5.0
 Tested up to: 6.7.2
-Requires PHP: 7.0
-Stable tag: 1.5
+Requires PHP: 7.0 Stable tag: 1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +100,16 @@ You can report the bugs and request new features you need to see at our [GitHub 
 
 == Changelog ==
 
+= 1.6 =
+Released on [Your Release Date]
+New features:
+- Switched from PNG icon to SVG for better scalability and customization.
+- Added a setting to allow users to provide their own custom SVG markup for the link icon.
+- Default icon is now a GitHub-style link icon.
+- Adjusted CSS for SVG icon display and alignment.
+- Added option to set a custom icon size in pixels.
+- Modified icon size option to accept various CSS units (px, em, rem, %, etc.).
+- Added option to set a custom icon color using WordPress color picker; defaults to heading color.
 = 1.5 =
 Released on 4 April 2025
 New features:

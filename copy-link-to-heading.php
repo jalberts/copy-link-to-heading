@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Copy Link to Heading
  * Description: Adds a copy link icon to headings for easy copying, bookmarking, sharing, and navigation within the content.
- * Version: 1.5
+ * Version: 1.6
  * Author: Jose Varghese
  * Requires at least: 5.0
  * Requires PHP: 7.0
@@ -45,9 +45,12 @@ function clth_enqueue_assets() {
     // Add defer attribute to script
     wp_script_add_data( 'clth-script', 'defer', true );
 
+    $custom_svg = get_option( 'clth_custom_svg_icon', '' );
+    $icon_svg   = ! empty( trim( $custom_svg ) ) ? $custom_svg : clth_get_default_svg_icon();
+
     // Pass data to JS
     wp_localize_script( 'clth-script', 'clthData', array(
-        'iconUrl'           => $plugin_url . 'images/link-icon.png',
+        'iconSvg'           => $icon_svg,
         'headings'          => get_option( 'clth_heading_levels', array( 'h2', 'h3', 'h4', 'h5', 'h6' ) ),
         'showIconOnMobile'  => get_option( 'clth_show_icon_on_mobile', true ),
         'enableTooltip'     => get_option( 'clth_enable_tooltip', true ),
@@ -55,9 +58,25 @@ function clth_enqueue_assets() {
         'copiedText'        => get_option( 'clth_copied_text', 'Copied' ),
         'iconPosition'      => get_option( 'clth_icon_position', 'after' ),
         'showIconOnDesktop' => get_option( 'clth_show_icon_on_desktop', false ),
+        'iconSize'          => get_option( 'clth_icon_size', '' ), // Pass as string
+        'iconColor'         => get_option( 'clth_icon_color', '' ), // Default empty, implies currentColor
     ) );
 }
 add_action( 'wp_enqueue_scripts', 'clth_enqueue_assets' );
+
+// Enqueue admin scripts for color picker
+function clth_admin_enqueue_scripts( $hook_suffix ) {
+    // Only load on our settings page: settings_page_clth-settings
+    if ( 'settings_page_clth-settings' !== $hook_suffix ) {
+        return;
+    }
+    // Enqueue WordPress color picker style and script
+    wp_enqueue_style( 'wp-color-picker' );
+    // Enqueue our custom admin script
+    wp_enqueue_script( 'clth-admin-script', plugin_dir_url( __FILE__ ) . 'js/clth-admin.js', array( 'jquery', 'wp-color-picker' ), clth_get_plugin_version(), true );
+}
+add_action( 'admin_enqueue_scripts', 'clth_admin_enqueue_scripts' );
+
 
 // Check whether to load the plugin on the current page
 function clth_should_load() {
@@ -228,22 +247,39 @@ function clth_render_settings_page() {
                         <p class="description"><?php esc_html_e( 'If unchecked, the icon will appear on hover as usual. This setting is separate from mobile behavior.', 'copy-link-to-heading' ); ?></p>
                     </td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row"><?php esc_html_e( 'Custom SVG Icon:', 'copy-link-to-heading' ); ?></th>
+                    <td>
+                        <textarea name="clth_custom_svg_icon" rows="5" class="large-text code"><?php echo esc_textarea( get_option( 'clth_custom_svg_icon', '' ) ); ?></textarea>
+                        <p class="description">
+                            <?php esc_html_e( 'Enter your custom SVG markup for the link icon. If empty, the default icon will be used.', 'copy-link-to-heading' ); ?>
+                            <br>
+                            <?php esc_html_e( 'Default icon example (ensure your SVG has `fill="currentColor"` for theme compatibility):', 'copy-link-to-heading' ); ?>
+                            <code><?php echo esc_html( clth_get_default_svg_icon() ); ?></code>
+                        </p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php esc_html_e( 'Icon Size (px):', 'copy-link-to-heading' ); ?></th>
+                    <td>
+                        <input type="text" name="clth_icon_size" value="<?php echo esc_attr( get_option( 'clth_icon_size', '' ) ); ?>" class="small-text" placeholder="e.g., 16px or 1.2em" />
+                        <p class="description"><?php esc_html_e( 'Override the default icon size. Enter a value with a unit (e.g., 16px, 1.2em, 100%). If only a number is entered, "px" will be assumed. Leave empty to use the default size (1em, scales with text).', 'copy-link-to-heading' ); ?></p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php esc_html_e( 'Icon Color:', 'copy-link-to-heading' ); ?></th>
+                    <td>
+                        <input type="text" name="clth_icon_color" value="<?php echo esc_attr( get_option( 'clth_icon_color', '' ) ); ?>" class="clth-color-picker" data-default-color="" />
+                        <p class="description"><?php esc_html_e( 'Choose a custom color for the icon. Leave empty to inherit the heading\'s text color.', 'copy-link-to-heading' ); ?></p>
+                    </td>
+                </tr>
+
+
+
             </table>
             <?php submit_button(); ?>
         </form>
     </div>
-    <script>
-        document.addEventListener( 'DOMContentLoaded', function () {
-            const tooltipCheckbox = document.getElementById( 'clth_enable_tooltip' );
-            const tooltipTextOptions = document.querySelectorAll( '.tooltip-text-options' );
-
-            tooltipCheckbox.addEventListener( 'change', function () {
-                tooltipTextOptions.forEach( option => {
-                    option.style.display = this.checked ? '' : 'none';
-                } );
-            } );
-        } );
-    </script>
     <?php
 }
 
@@ -342,6 +378,28 @@ function clth_register_settings() {
         'default'           => false,
     );
     register_setting( 'clth_options_group', 'clth_show_icon_on_desktop', $args_show_icon_on_desktop );
+
+    $args_custom_svg = array(
+        'sanitize_callback' => 'clth_sanitize_svg',
+        'default'           => '',
+        'type'              => 'string',
+        'show_in_rest'      => false,
+    );
+    register_setting( 'clth_options_group', 'clth_custom_svg_icon', $args_custom_svg );
+
+    $args_icon_size = array(
+        'sanitize_callback' => 'clth_sanitize_icon_size_string',
+        'default'           => '',        // Empty means use CSS default
+        'type'              => 'string',
+    );
+    register_setting( 'clth_options_group', 'clth_icon_size', $args_icon_size );
+
+    $args_icon_color = array(
+        'sanitize_callback' => 'clth_sanitize_color',
+        'default'           => '', // Empty means use currentColor (inherit)
+        'type'              => 'string',
+    );
+    register_setting( 'clth_options_group', 'clth_icon_color', $args_icon_color );
 }
 add_action( 'admin_init', 'clth_register_settings' );
 
@@ -370,6 +428,43 @@ function clth_sanitize_ids( $input ) {
     return array_filter( array_map( 'absint', (array) $input ) );
 }
 
+function clth_sanitize_icon_size_string( $input ) {
+    $input = trim( (string) $input );
+    if ( empty( $input ) ) {
+        return ''; // Use CSS default
+    }
+
+    // If it's just a number, append 'px'
+    if ( is_numeric( $input ) ) {
+        return floatval( $input ) . 'px';
+    }
+
+    // Check for valid CSS size format (number followed by allowed unit)
+    // Allows for units like px, em, rem, %, vw, vh.
+    if ( preg_match( '/^(\d*\.?\d+)(px|em|rem|%|vw|vh)$/i', $input, $matches ) ) {
+        // Reconstruct to ensure consistent formatting e.g. lowercase unit
+        return $matches[1] . strtolower( $matches[2] );
+    }
+
+    return ''; // Invalid format, revert to CSS default
+}
+
+function clth_sanitize_color( $color ) {
+    $color = trim( (string) $color );
+    if ( empty( $color ) ) {
+        return ''; // Default to currentColor (inherit)
+    }
+    // Check if it's a valid hex color (3, 6, or 8 digits).
+    if ( preg_match( '/^#([a-f0-9]{3}){1,2}([a-f0-9]{2})?$/i', $color ) ) {
+        return $color;
+    }
+    // Basic check for rgba/rgb - WordPress color picker might not output this directly but user could type it
+    if ( preg_match( '/^rgba?\s*\((\s*\d+\s*,){2,3}\s*[\d\.]+\s*\)$/i', $color ) ) {
+        return $color;
+    }
+    return ''; // Invalid color format, revert to default (inherit)
+}
+
 // Admin footer text only on the settings page, with proper output escaping
 function clth_admin_footer_text( $text ) {
     global $pagenow;
@@ -390,6 +485,64 @@ function clth_get_plugin_version() {
     return $plugin_data['Version'];
 }
 
+// Helper function to get the default SVG icon
+/**
+ * Get the default SVG icon markup.
+ *
+ * @return string SVG markup.
+ */
+function clth_get_default_svg_icon() {
+    // A GitHub-style link icon
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="clth-svg-icon" aria-hidden="true">'; // Removed fixed width and height
+    $svg .= '<path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path>';
+    $svg .= '</svg>';
+    return $svg;
+}
+
+/**
+ * Sanitize custom SVG input.
+ *
+ * @param string $input The SVG markup.
+ * @return string Sanitized SVG markup or empty string.
+ */
+function clth_sanitize_svg( $input ) {
+    $input = trim( $input );
+    if ( empty( $input ) ) {
+        return ''; // Return empty to use default
+    }
+
+    $allowed_protocols = array( 'http', 'https', 'mailto' );
+
+    $allowed_tags = array(
+        'svg' => array(
+            'xmlns' => true, 'viewbox' => true, 'width' => true, 'height' => true,
+            'fill' => true, 'class' => true, 'style' => true, 'aria-hidden' => true,
+            'version' => true, 'focusable' => true, 'role' => true,
+        ),
+        'path' => array(
+            'd' => true, 'fill' => true, 'fill-rule' => true, 'class' => true,
+            'style' => true, 'transform' => true,
+        ),
+        'g' => array( 'fill' => true, 'class'=> true, 'style'=> true, 'transform' => true ),
+        'title' => array(), 'desc' => array(),
+    );
+    $shape_attrs = array( 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'class' => true, 'style' => true, 'transform' => true );
+    $allowed_tags['circle']   = array_merge( array('cx' => true, 'cy' => true, 'r' => true), $shape_attrs );
+    $allowed_tags['rect']     = array_merge( array('x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true), $shape_attrs );
+    $allowed_tags['line']     = array_merge( array('x1' => true, 'y1' => true, 'x2' => true, 'y2' => true), $shape_attrs );
+    $allowed_tags['polyline'] = array_merge( array('points' => true), $shape_attrs );
+    $allowed_tags['polygon']  = array_merge( array('points' => true), $shape_attrs );
+
+    $cleaned_svg = wp_kses( $input, $allowed_tags, $allowed_protocols );
+    $trimmed_cleaned_svg = trim( $cleaned_svg );
+
+    if ( ! empty( $trimmed_cleaned_svg ) && strtolower( substr( $trimmed_cleaned_svg, 0, 4 ) ) === '<svg' && strtolower( substr( $trimmed_cleaned_svg, -6 ) ) === '</svg>' ) {
+        return $cleaned_svg;
+    }
+    add_settings_error( 'clth_custom_svg_icon', 'invalid_svg', __( 'The custom SVG provided was invalid or contained disallowed elements and could not be saved. The default icon will be used.', 'copy-link-to-heading' ), 'error' );
+    return '';
+}
+
 // Uninstall cleanup
 register_uninstall_hook( __FILE__, 'clth_uninstall_cleanup' );
 function clth_uninstall_cleanup() {
@@ -404,4 +557,7 @@ function clth_uninstall_cleanup() {
     delete_option( 'clth_copied_text' );
     delete_option( 'clth_icon_position' );
     delete_option( 'clth_show_icon_on_desktop' );
+    delete_option( 'clth_custom_svg_icon' );
+    delete_option( 'clth_icon_size' );
+    delete_option( 'clth_icon_color' );
 }

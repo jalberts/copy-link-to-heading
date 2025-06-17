@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     const headings = clthData.headings;
-    const iconUrl = clthData.iconUrl;
+    const iconSvg = clthData.iconSvg;
     const showIconOnMobile = clthData.showIconOnMobile;
     const showIconOnDesktop = clthData.showIconOnDesktop;
     const enableTooltip = clthData.enableTooltip; 
     const copyText = clthData.copyText || 'Copy Link to Heading';
     const copiedText = clthData.copiedText || 'Copied';
     const iconPosition = clthData.iconPosition || 'after';
+    const iconSize = clthData.iconSize; // Get icon size string (e.g., "16px", "1.2em", or empty)
+    const iconColor = clthData.iconColor; // Get icon color string (e.g., "#ff0000", or empty for currentColor)
     const contentSelector = '.entry-content, .post-content, .page-content, [class*="content"], [role="main"]'; // Added more generic selectors
 
     // Add or remove class on the body based on mobile and desktop settings
@@ -43,7 +45,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!heading.querySelector('.clth-copy-icon')) {
                     const icon = document.createElement('span');
                     icon.classList.add('clth-copy-icon');
-                    icon.style.backgroundImage = `url('${iconUrl}')`;
+                    icon.innerHTML = iconSvg;
+
+                    const svgElement = icon.querySelector('svg');
+                    if (svgElement) {
+                        // Apply custom size if specified
+                        if (iconSize) { // Check if iconSize string is not empty
+                            svgElement.style.width = iconSize;
+                            svgElement.style.height = iconSize;
+                        }
+                        // Apply custom color if specified, otherwise it inherits via CSS (currentColor)
+                        if (iconColor) {
+                            svgElement.style.fill = iconColor;
+                        }
+                    }
+
 
                     if (enableTooltip) {
                         const tooltip = document.createElement('span');
@@ -55,16 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (iconPosition === 'before') {
                         // Insert icon before the heading's first child and add a small right margin
                         heading.insertBefore(icon, heading.firstChild);
-                        icon.style.marginRight = '8px';
-                        // Force icon to display by default
-                        icon.style.display = 'inline-block';
+                        icon.classList.add('clth-icon-position-before'); // Add class for CSS to handle margin
                     } else {
                         // Default: insert icon after the heading content
                         heading.appendChild(icon);
-                        // For 'after' position, if desktop option is enabled then force display
-                        if (showIconOnDesktop) {
-                            icon.style.display = 'inline-block';
-                        }
                     }
 
                     icon.addEventListener('click', function () {
