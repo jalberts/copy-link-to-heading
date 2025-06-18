@@ -114,6 +114,7 @@ New features:
 - Added option to specify custom CSS selectors for content areas to improve theme compatibility.
 - Improved helper text for the custom content selectors option for better clarity.
 - Adjusted default styles for tooltip.
+- Hardened sanitization for the custom content selectors option to enhance security.
 
 = 1.5 =
 Released on 4 April 2025

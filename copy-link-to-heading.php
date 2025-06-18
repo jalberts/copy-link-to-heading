@@ -422,7 +422,7 @@ function clth_register_settings() {
     register_setting( 'clth_options_group', 'clth_icon_color', $args_icon_color );
 
     $args_custom_selectors = array(
-        'sanitize_callback' => 'sanitize_text_field',
+        'sanitize_callback' => 'clth_sanitize_css_selectors',
         'default'           => '',
         'type'              => 'string',
     );
@@ -453,6 +453,16 @@ function clth_sanitize_ids( $input ) {
         $input = explode( ',', $input );
     }
     return array_filter( array_map( 'absint', (array) $input ) );
+}
+
+function clth_sanitize_css_selectors( $selectors ) {
+    // Strip any HTML tags to prevent script injection.
+    $sanitized = wp_strip_all_tags( (string) $selectors );
+    // For good measure, remove backticks as they have no place in CSS selectors
+    // and can be used in JS template literals.
+    $sanitized = str_replace( '`', '', $sanitized );
+    // Return the trimmed, safer string.
+    return trim( $sanitized );
 }
 
 function clth_sanitize_icon_size_string( $input ) {
