@@ -107,9 +107,14 @@ New features:
 - Added a setting to allow users to provide their own custom SVG markup for the link icon.
 - Default icon is now a GitHub-style link icon.
 - Adjusted CSS for SVG icon display and alignment.
-- Added option to set a custom icon size in pixels.
+- Added option to set a custom icon size.
 - Modified icon size option to accept various CSS units (px, em, rem, %, etc.).
 - Added option to set a custom icon color using WordPress color picker; defaults to heading color.
+- Added additional CSS selectors for broader theme compatibility
+- Added option to specify custom CSS selectors for content areas to improve theme compatibility.
+- Improved helper text for the custom content selectors option for better clarity.
+- Adjusted default styles for tooltip.
+
 = 1.5 =
 Released on 4 April 2025
 New features:

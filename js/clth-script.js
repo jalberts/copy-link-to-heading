@@ -9,7 +9,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const iconPosition = clthData.iconPosition || 'after';
     const iconSize = clthData.iconSize; // Get icon size string (e.g., "16px", "1.2em", or empty)
     const iconColor = clthData.iconColor; // Get icon color string (e.g., "#ff0000", or empty for currentColor)
-    const contentSelector = '.entry-content, .post-content, .page-content, [class*="content"], [role="main"]'; // Added more generic selectors
+    const customSelectors = clthData.customSelectors;
+
+    // Default selectors cover common WordPress content areas.
+    let contentSelector = '.entry-content, .post-content, .page-content, .site-content, .main-content, [role="main"]';
+    if (customSelectors) {
+        contentSelector += ', ' + customSelectors;
+    }
 
     // Add or remove class on the body based on mobile and desktop settings
     if (showIconOnMobile) {

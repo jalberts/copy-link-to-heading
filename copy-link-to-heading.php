@@ -60,6 +60,7 @@ function clth_enqueue_assets() {
         'showIconOnDesktop' => get_option( 'clth_show_icon_on_desktop', false ),
         'iconSize'          => get_option( 'clth_icon_size', '' ), // Pass as string
         'iconColor'         => get_option( 'clth_icon_color', '' ), // Default empty, implies currentColor
+        'customSelectors'   => get_option( 'clth_custom_selectors', '' ),
     ) );
 }
 add_action( 'wp_enqueue_scripts', 'clth_enqueue_assets' );
@@ -274,6 +275,25 @@ function clth_render_settings_page() {
                     </td>
                 </tr>
 
+                <tr valign="top">
+                    <th scope="row"><?php esc_html_e( 'Custom Content Selectors:', 'copy-link-to-heading' ); ?></th>
+                    <td>
+                        <input type="text" name="clth_custom_selectors" value="<?php echo esc_attr( get_option( 'clth_custom_selectors', '' ) ); ?>" class="large-text" placeholder="e.g., .article-body, #main" />
+                        <p class="description">
+                            <?php
+                            echo wp_kses(
+                                sprintf(
+                                    /* translators: %s: A list of default CSS selectors. */
+                                    __( 'Add custom CSS selectors (comma-separated) if the icon isn\'t appearing. These are added to the defaults: %s', 'copy-link-to-heading' ),
+                                    '<code>.entry-content, .post-content, .page-content, .site-content, .main-content, [role="main"]</code>'
+                                ),
+                                array( 'code' => array() )
+                            );
+                            ?>
+                        </p>
+                    </td>
+                </tr>
+
 
 
             </table>
@@ -400,6 +420,13 @@ function clth_register_settings() {
         'type'              => 'string',
     );
     register_setting( 'clth_options_group', 'clth_icon_color', $args_icon_color );
+
+    $args_custom_selectors = array(
+        'sanitize_callback' => 'sanitize_text_field',
+        'default'           => '',
+        'type'              => 'string',
+    );
+    register_setting( 'clth_options_group', 'clth_custom_selectors', $args_custom_selectors );
 }
 add_action( 'admin_init', 'clth_register_settings' );
 
@@ -560,4 +587,5 @@ function clth_uninstall_cleanup() {
     delete_option( 'clth_custom_svg_icon' );
     delete_option( 'clth_icon_size' );
     delete_option( 'clth_icon_color' );
+    delete_option( 'clth_custom_selectors' );
 }

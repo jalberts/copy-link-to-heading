@@ -64,8 +64,9 @@ body.clth-show-icon-desktop .clth-copy-icon {
     background-color: black;
     color: #fff;
     text-align: center;
-    font-size: 12px; /* Compact font size */
-    padding: 3px 6px; /* Adjust padding for smaller size */
+    font-size: 0.75rem; /* Compact font size */
+    line-height: 1.5; /* Improved readability */
+    padding: 0.5rem; /* Adjust padding for smaller size */
     border-radius: 3px; /* Subtle rounding */
     
     /* Position the tooltip */
