@@ -1,44 +1,40 @@
-/* Default styles for the copy icon */
-.clth-copy-icon {
+/* Default styles for the copy icon wrapper */
+.clth-copy-icon-wrapper {
     display: none;
-    width: 16px;
-    height: 16px;
-    margin-left: 8px;
     cursor: pointer;
-    background-size: contain;
-    background-repeat: no-repeat;
     vertical-align: middle;
     transition: opacity 0.2s;
+    position: relative;
 }
 
 /* Show icon on hover for desktop (only if not forced to show) */
-h2:hover .clth-copy-icon,
-h3:hover .clth-copy-icon,
-h4:hover .clth-copy-icon,
-h5:hover .clth-copy-icon,
-h6:hover .clth-copy-icon {
+h2:hover .clth-copy-icon-wrapper,
+h3:hover .clth-copy-icon-wrapper,
+h4:hover .clth-copy-icon-wrapper,
+h5:hover .clth-copy-icon-wrapper,
+h6:hover .clth-copy-icon-wrapper {
     display: inline-block;
 }
 
 /* Ensure the icon aligns properly when shown */
-.clth-copy-icon:hover {
+.clth-copy-icon-wrapper:hover {
     opacity: 1;
 }
 
 /* Mobile-specific styles when "Always Show Icon on Mobile" is enabled */
 @media (max-width: 768px) {
-    body.clth-show-icon-mobile .clth-copy-icon {
+    body.clth-show-icon-mobile .clth-copy-icon-wrapper {
         display: inline-block !important;
     }
 }
 
 /* Desktop always show icon */
-body.clth-show-icon-desktop .clth-copy-icon {
+body.clth-show-icon-desktop .clth-copy-icon-wrapper {
     display: inline-block !important;
 }
 
 /* Tooltip container */
-.clth-copy-icon {
+.clth-copy-icon-wrapper {
     position: relative;
 }
 
@@ -48,14 +44,19 @@ body.clth-show-icon-desktop .clth-copy-icon {
     background-color: black;
     color: #fff;
     text-align: center;
-    font-size: 12px; /* Compact font size */
-    padding: 3px 6px; /* Adjust padding for smaller size */
-    border-radius: 3px; /* Subtle rounding */
-    
+    font-size: 12px;
+    line-height: normal;
+    /* Compact font size */
+    padding: 3px 6px;
+    /* Adjust padding for smaller size */
+    border-radius: 3px;
+    /* Subtle rounding */
+
     /* Position the tooltip */
     position: absolute;
     z-index: 1;
-    bottom: 150%; /* Position above the icon */
+    bottom: 150%;
+    /* Position above the icon */
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -67,16 +68,73 @@ body.clth-show-icon-desktop .clth-copy-icon {
 .clth-tooltip::after {
     content: '';
     position: absolute;
-    top: 100%; /* Position arrow below the tooltip */
+    top: 100%;
+    /* Position arrow below the tooltip */
     left: 50%;
-    margin-left: -5px; /* Center the arrow */
+    margin-left: -5px;
+    /* Center the arrow */
     border-width: 5px;
     border-style: solid;
-    border-color: black transparent transparent transparent; /* Arrow pointing down */
+    border-color: black transparent transparent transparent;
+    /* Arrow pointing down */
 }
 
 /* Show the tooltip on hover */
-.clth-copy-icon:hover .clth-tooltip {
+.clth-copy-icon-wrapper:hover .clth-tooltip {
     visibility: visible;
     opacity: 1;
+}
+
+/* SVG Styling */
+.clth-copy-icon svg {
+    fill: none;
+    /* Default for stroke icons, override for fill icons below */
+}
+
+/* Stroke-based Icons */
+.clth-icon-stroke svg path,
+.clth-icon-stroke svg line,
+.clth-icon-stroke svg circle {
+    stroke: currentColor;
+    fill: none;
+    transition: stroke-width 0.2s;
+}
+
+.clth-thickness-normal.clth-icon-stroke svg path,
+.clth-thickness-normal.clth-icon-stroke svg line {
+    stroke-width: 2px;
+}
+
+.clth-thickness-medium.clth-icon-stroke svg path,
+.clth-thickness-medium.clth-icon-stroke svg line {
+    stroke-width: 2.5px;
+}
+
+.clth-thickness-bold.clth-icon-stroke svg path,
+.clth-thickness-bold.clth-icon-stroke svg line {
+    stroke-width: 3px;
+}
+
+
+/* Fill-based Icons */
+.clth-icon-fill svg path {
+    fill: currentColor;
+    stroke: none;
+    transition: stroke-width 0.2s;
+}
+
+.clth-thickness-normal.clth-icon-fill svg path {
+    stroke: none;
+}
+
+.clth-thickness-medium.clth-icon-fill svg path {
+    stroke: currentColor;
+    stroke-width: 0.5px;
+    paint-order: stroke fill;
+}
+
+.clth-thickness-bold.clth-icon-fill svg path {
+    stroke: currentColor;
+    stroke-width: 1px;
+    paint-order: stroke fill;
 }
