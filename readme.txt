@@ -1,10 +1,11 @@
 === Copy Link to Heading - Easily add Anchor links for Headings ===
 Contributors: josevarghese
+Donate link: https://superwebshare.com/zamy
 Tags: headings, copy link, content navigation, deep linking, anchor links
 Requires at least: 5.0
-Tested up to: 6.7.2
+Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 1.5
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +22,7 @@ The Copy Link to Heading plugin automatically adds a small, unobtrusive link ico
 - You can easily share specific heading content sections with friends and colleagues or on social media.
 - Navigate quickly to a specific part of a long article or documentation.
 - Enhancing accessibility by enabling deep linking to specific sections.
+- Supports screen readers with proper `aria-label` attributes, keyboard navigation (Enter/Space keys), and `aria-live` region announcements when a link is copied.
 
 The plugin is designed to be lightweight and user-friendly. It is perfect for blogs, documentation sites, WooCommerce stores, and any site with long-form content.
 
@@ -34,6 +36,7 @@ The plugin is designed to be lightweight and user-friendly. It is perfect for bl
 - Lightweight and optimized for performance.
 - Option to always show the copy link to the heading icon for mobile devices.
 - Option to add a tooltip for the link icon or to choose the browser alert for copying the link of the heading.
+- The link icon effortlessly scales with the heading text size using relative sizing.
 
 == How does the anchor links are generated? ==
 - When the page loads, the plugin automatically generates anchor links for headings on the frontend. No changes are required in the WordPress editor or post content.
@@ -65,6 +68,16 @@ Whether managing a blog, a technical documentation site, or a WooCommerce store,
 
 Visit "Settings" -> "Copy Link to Heading" in your WordPress dashboard. You can select which heading levels and content types (e.g., posts, pages, custom post types) will display the link icon.
 
+= Can I add custom CSS classes to detect headings within specific sections? =
+
+Yes! By default, the plugin looks for headings inside `.entry-content`, `.post-content`, `.page-content` and `.dynamic-entry-content`. If your theme uses different classes, you can add them using the `clth_content_selectors` filter in your theme's `functions.php`:
+
+`
+add_filter( 'clth_content_selectors', function( $selectors ) {
+    return $selectors . ', .my-custom-content-wrapper';
+} );
+`
+
 = Can I customize the heading levels that display the icon? =
 
 Yes! You can choose which heading levels (H1 to H6) to include from the settings page. By default, the plugin excludes H1, usually reserved for the main title. The page title won’t be shown with a link as the link is same as the page.
@@ -83,7 +96,7 @@ We welcome contributions! Feel free to create a pull request or submit a feature
 
 = The plugin is not working on my website, what will I do? =
 
-First, ensure that your website has SSL (https://) and you have cleared the cachings. If the issue persists when checking via an iconginto window after clearing the cache, perform a conflict check. If the problem still remains, [please open a new topic clearly explaining the issue and how we can improve it](https://wordpress.org/support/plugin/copy-link-to-heading/#new-post).
+First, ensure that your website has SSL (https://) and you have cleared the cachings. If the issue persists when checking via an iconginto window after clearing the cache, perform a conflict check. If the problem still remains, [please open a new topic clearly explaining the issue and how we can improve it](https://wordpress.org/support/plugin/copy-link-to-heading/#new-topic-0).
 As this is a small plugin, your active contributions in reporting bugs and suggesting features are essential to make it better.
 
 = How can I contribute to this awesome plugin? =
@@ -100,6 +113,22 @@ You can report the bugs and request new features you need to see at our [GitHub 
 2. **Settings Page:** Configure which heading levels and content types should display the link icon.
 
 == Changelog ==
+
+= 2.0 = 
+Released on 3 March 2026
+
+* New: Added multiple icon styles (Standard, Hash, Paperclip, Copy).
+* New: Added custom icon upload support.
+* New: Added option to change icon color.
+* New: Improved the settings UI for icon customization.
+* New: Added an option to customize the icon thickness (Default: Bold).
+* Added support for dynamic content heading detections
+* New: Added an option to minify CSS and JS files for better performance.
+* New: Supports screen readers with proper `aria-label` attributes, keyboard navigation (Enter/Space keys), and `aria-live` regions for copy announcements.
+
+= 1.6 =
+Released on 16 July 2025
+- Minor enhancement tweaks
 
 = 1.5 =
 Released on 4 April 2025
